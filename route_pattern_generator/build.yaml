@@ -1,0 +1,15 @@
+targets:
+  $default:
+    builders:
+      route_pattern_generator|route_pattern:
+        enabled: true
+
+builders:
+  route_pattern_generator:
+    target: ":route_pattern_generator"
+    import: "package:route_pattern_generator/builder.dart"
+    builder_factories: ["route_pattern"]
+    build_extensions: {".dart": [".route_pattern.g.part"]}
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]
