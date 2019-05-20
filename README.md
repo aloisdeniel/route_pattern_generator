@@ -18,26 +18,31 @@ const home = "/?tab";
 const article = "/article/:id";
 ```
 
-Each constant will generate a `Route` with a `build` and `match` method, and a corresponding `Argument` class ([an example of the generate sources is available in the sample](sample/lib/routes.g.dart)).
+Each constant will generate a `Route` with a `build` and `match` method, and a associated `Argument` class ([an example of the generate sources is available in the sample](sample/lib/routes.g.dart)).
 
 ```dart
-final route = HomeRoute();
-
-final path = route.build(HomeRouteArguments(tab: "users"));
+final path = Routes.home.build(HomeRouteArguments(tab: "users"));
 expect(path, "/?tab=users");
 
-final match = route.match("/?tab=users");
+final match = Routes.home.match("/?tab=users");
 expect(match.isSuccess, true);
 expect(match.arguments.tab, '12345');
 
-final route = ArticleRoute();
-
-final path = route.build(ArticleRouteArguments(id: "12345"));
+final path = Routes.article.build(ArticleRouteArguments(id: "12345"));
 expect(path, "/article/12345");
 
-final match = route.match("/article/12345");
+final match = Routes.article.match("/article/12345");
 expect(match.isSuccess, true);
 expect(match.arguments.id, '12345');
+```
+
+A `router` is also generated to help you match one of the declared routes.
+
+```dart
+final match = router.match("/article/12345");
+if(match is MatchResult<ArticleRouteArguments>) {
+    expect(match.arguments.id, '12345');
+}
 ```
 
 ## How to use

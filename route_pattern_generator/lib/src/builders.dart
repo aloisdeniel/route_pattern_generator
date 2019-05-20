@@ -1,5 +1,7 @@
+import 'package:analyzer/dart/element/element.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:recase/recase.dart';
+import 'package:source_gen/source_gen.dart';
 
 import 'parsing.dart';
 
@@ -10,22 +12,33 @@ class RouteNaming {
   String get argumentName => "${_name.pascalCase}RouteArguments";
 }
 
+class RouterBuilder {
+  Code build(List<AnnotatedElement> elements) {
+    final body = StringBuffer("const router = const Router(routes:[");
+    final routes = elements.map((x) => "Routes." + x.element.name).join(",");
+    body.write(routes);
+    body.write("]);");
+    return Code(body.toString());
+  }
+}
+
+class RoutesBuilder {
+  Class build(List<AnnotatedElement> elements) {
+    final builder = ClassBuilder()
+      ..name = "Routes"
+      ..abstract = true;
+
+    elements.forEach((e) => builder.fields.add(Field((b) => b
+      ..name = e.element.name
+      ..modifier = FieldModifier.constant
+      ..static = true
+      ..assignment = Code(RouteNaming(e.element.name).routeName + '()'))));
+
+    return builder.build();
+  }
+}
+
 class RouteBuilder {
-  /*
-    final parsed = ParsedRoute.fromPath(path);
-    if (parsed.requiredCount != 2 || parsed.required(0) != "test") {
-      return MatchResult.fail(this);
-    }
-
-    return MatchResult.success(
-        this,
-        ExampleRouteArguments(
-          requiredExample: parsed.required(1),
-          optionalExample1: parsed.optional("optionalExample1"),
-          optionalExample2: parsed.optional("optionalExample2"),
-        ));
-        */
-
   Method _createMatch(ParsedPattern pattern, RouteNaming naming) {
     final body = StringBuffer();
 
@@ -36,16 +49,16 @@ class RouteBuilder {
           .map((x) => 'parsed.required(${x.index}) != "${x.value}"'));
 
     body.write("final parsed = ParsedRoute.fromPath(path);");
-    body.write("if (${conditions.join(" || ")}) return MatchResult.fail(this);");
+    body.write(
+        "if (${conditions.join(" || ")}) return MatchResult.fail(this);");
     body.write("return MatchResult.success(this,${naming.argumentName}(");
 
     pattern.segments
-          .where((x) => x is DynamicSegment)
-          .cast<DynamicSegment>()
-          .forEach((x) => body.write("${x.name}: parsed.required(${x.index}),"));
+        .where((x) => x is DynamicSegment)
+        .cast<DynamicSegment>()
+        .forEach((x) => body.write("${x.name}: parsed.required(${x.index}),"));
 
-    pattern.query
-          .forEach((x) => body.write('$x: parsed.optional("$x"),'));
+    pattern.query.forEach((x) => body.write('$x: parsed.optional("$x"),'));
 
     body.write("));");
 
@@ -97,7 +110,7 @@ class RouteBuilder {
       ..name = naming.routeName
       ..extend = refer("Route<${naming.argumentName}>");
 
-    //MatchResult<ArticleRouteArguments> match(String path)
+    builder.constructors.add(Constructor((b) => b..constant = true));
 
     builder.methods.add(_createMatch(pattern, naming));
     builder.methods.add(_createBuild(pattern, naming));

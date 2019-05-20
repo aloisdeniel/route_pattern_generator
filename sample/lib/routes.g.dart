@@ -6,6 +6,14 @@ part of 'routes.dart';
 // RoutePatternGenerator
 // **************************************************************************
 
+const router = const Router(routes: [Routes.home, Routes.article]);
+
+abstract class Routes {
+  static const home = HomeRoute();
+
+  static const article = ArticleRoute();
+}
+
 class HomeRouteArguments {
   HomeRouteArguments({this.tab});
 
@@ -13,6 +21,8 @@ class HomeRouteArguments {
 }
 
 class HomeRoute extends Route<HomeRouteArguments> {
+  const HomeRoute();
+
   @override
   MatchResult<HomeRouteArguments> match(String path) {
     final parsed = ParsedRoute.fromPath(path);
@@ -37,6 +47,8 @@ class ArticleRouteArguments {
 }
 
 class ArticleRoute extends Route<ArticleRouteArguments> {
+  const ArticleRoute();
+
   @override
   MatchResult<ArticleRouteArguments> match(String path) {
     final parsed = ParsedRoute.fromPath(path);

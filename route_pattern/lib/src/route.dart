@@ -1,23 +1,14 @@
 import 'package:meta/meta.dart';
 
-class MatchResult<T> {
-  final Route<T> route;
-  final T arguments;
-  final bool isSuccess;
-  MatchResult._(
-      {@required this.route,
-      @required this.arguments,
-      @required this.isSuccess});
-
-  MatchResult.fail(Route<T> route)
-      : this._(isSuccess: false, route: route, arguments: null);
-
-  MatchResult.success(Route<T> route, T arguments)
-      : this._(isSuccess: true, route: route, arguments: arguments);
-}
-
+/// A base route class that can build or match pathes.
 abstract class Route<T> {
+
+  const Route();
+
+  /// Build a new path from given [args].
   String build(T args);
+
+  /// Trying to match the given [path].
   MatchResult<T> match(String path);
 
   static String buildPath([List<String> segments, Map<String, String> query]) {
@@ -43,8 +34,14 @@ abstract class Route<T> {
   }
 }
 
+/// The result of a parsed path to extract path 
+/// segments and query arguments.
+/// 
+/// Generally used underneat by the implemented [Route]s.
 class ParsedRoute {
+
   final List<String> _segments;
+
   final Map<String, String> _query;
 
   bool get hasOptionals => _query.isNotEmpty;
@@ -76,4 +73,20 @@ class ParsedRoute {
     final result = _query[name];
     return result == null ? null : result;
   }
+}
+
+class MatchResult<T> {
+  final Route<T> route;
+  final T arguments;
+  final bool isSuccess;
+  MatchResult._(
+      {@required this.route,
+      @required this.arguments,
+      @required this.isSuccess});
+
+  MatchResult.fail(Route<T> route)
+      : this._(isSuccess: false, route: route, arguments: null);
+
+  MatchResult.success(Route<T> route, T arguments)
+      : this._(isSuccess: true, route: route, arguments: arguments);
 }
