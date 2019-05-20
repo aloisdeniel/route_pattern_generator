@@ -1,5 +1,5 @@
 name: route_pattern
-version: 0.3.0
+version: 0.4.0
 author: Aloïs Deniel <alois.deniel@outlook.com>
 description: A Dart static code generator that produces matchers and builders from route uri patterns.
 homepage: https://github.com/aloisdeniel/route_pattern_generator

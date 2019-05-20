@@ -64,21 +64,25 @@ dev_dependencies:
 
 A route pattern is composed of static segments separated with `/`, **required** parameters as dynamic segments (starting with `:`), and **optional** parameters as query parameters (starting with `?` and separated by `&`).
 
+### Typing parameters
+
+By default, arguments are of type `String`, but a custom type surrounded with `[` and `]` can be added at the beginning of a required or optional parameter. This type must have static `T parse(String value)` and `String toString()`  methods to serialize and deserialize arguments from path.
+
 #### Example
 
-`/article/:id/details?tab&scroll`
+`/article/:[int]id/details?tab&[int]scroll`
 
 * `article` : static segment
-* `id` : required dynamic segment
+* `id` : required dynamic segment of type `int`
 * `details` : static segment
-* `tab` : optionnal query parameter
-* `scroll` : optionnal query parameter
+* `tab` : optionnal query parameter of type `String`
+* `scroll` : optionnal query parameter of type `int`
 
 This example will match those URIs :
 
 * `/article/26436/details`
-* `/article/DH4H5JH5/details?tab=1`
-* `/article/°098904/details?tab=first&scroll=8`
+* `/article/1234/details?tab=second`
+* `/article/98904/details?tab=first&scroll=8`
 
 ### Run the generator
 

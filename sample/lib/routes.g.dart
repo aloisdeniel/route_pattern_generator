@@ -19,9 +19,11 @@ abstract class Routes {
 }
 
 class HomeRouteArguments {
-  HomeRouteArguments({this.tab});
+  HomeRouteArguments({this.tab, this.scroll});
 
   final String tab;
+
+  final int scroll;
 }
 
 class HomeRoute extends Route<HomeRouteArguments> {
@@ -35,19 +37,23 @@ class HomeRoute extends Route<HomeRouteArguments> {
         this,
         HomeRouteArguments(
           tab: parsed.optional("tab"),
+          scroll: int.parse(parsed.optional("scroll")),
         ));
   }
 
   @override
   String build(HomeRouteArguments arguments) {
-    return Route.buildPath([], {"tab": arguments.tab});
+    return Route.buildPath([], {
+      "tab": arguments.tab.toString(),
+      "scroll": arguments.scroll.toString()
+    });
   }
 }
 
 class ArticleRouteArguments {
   ArticleRouteArguments({@required this.id});
 
-  final String id;
+  final int id;
 }
 
 class ArticleRoute extends Route<ArticleRouteArguments> {
@@ -61,12 +67,12 @@ class ArticleRoute extends Route<ArticleRouteArguments> {
     return MatchResult.success(
         this,
         ArticleRouteArguments(
-          id: parsed.required(1),
+          id: int.parse(parsed.required(1)),
         ));
   }
 
   @override
   String build(ArticleRouteArguments arguments) {
-    return Route.buildPath(["article", arguments.id]);
+    return Route.buildPath(["article", arguments.id.toString()]);
   }
 }

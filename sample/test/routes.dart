@@ -44,7 +44,7 @@ void main() {
       final route = ArticleRoute();
       final match = route.match("/article/874645234");
       expect(match.isSuccess, true);
-      expect(match.arguments.id, '874645234');
+      expect(match.arguments.id, 874645234);
     });
   });
 
@@ -53,7 +53,7 @@ void main() {
       final match = Routes.match("/article/12345");
       expect(match is MatchResult<ArticleRouteArguments>, true);
       if (match is MatchResult<ArticleRouteArguments>) {
-        expect(match.arguments.id, '12345');
+        expect(match.arguments.id, 12345);
       }
     });
   });

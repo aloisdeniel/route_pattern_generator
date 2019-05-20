@@ -32,8 +32,8 @@ class RoutePatternGenerator extends GeneratorForAnnotation<RoutePattern> {
 
       if(!element.isConst) {
         throw InvalidGenerationSourceError(
-        'The variable should be a constant of type String.',
-        todo: 'Change to a constant String.',
+        'The variable should be a constant or a final of type String.',
+        todo: 'Change to a constant or final String.',
         element: element);
       }
 

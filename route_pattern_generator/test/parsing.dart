@@ -46,15 +46,15 @@ void main() {
       expect(result.segments.isNotEmpty, true);
       expect(result.query.isNotEmpty, true);
 
-      expect(result.query.contains("test"), true);
+      expect(result.query.any((x) => x.name == "test"), true);
     });
     test('a pattern with multiple query parameters', () async {
       final result = ParsedPattern.fromString("/example/static?test&other");
       expect(result.segments.isNotEmpty, true);
       expect(result.query.length == 2, true);
 
-      expect(result.query.contains("test"), true);
-      expect(result.query.contains("other"), true);
+      expect(result.query.any((x) => x.name == "test"), true);
+      expect(result.query.any((x) => x.name == "other"), true);
     });
   });
 }

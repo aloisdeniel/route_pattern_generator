@@ -58,13 +58,17 @@ class RouteBuilder {
     body.write(
         "if (${conditions.join(" || ")}) return MatchResult.fail(this);");
     body.write("return MatchResult.success(this,${naming.argumentName}(");
-
     pattern.segments
         .where((x) => x is DynamicSegment)
         .cast<DynamicSegment>()
-        .forEach((x) => body.write("${x.name}: parsed.required(${x.index}),"));
+        .forEach((x) => x.type == "String"
+            ? body.write("${x.name}: parsed.required(${x.index}),")
+            : body.write(
+                "${x.name}: ${x.type}.parse(parsed.required(${x.index})),"));
 
-    pattern.query.forEach((x) => body.write('$x: parsed.optional("$x"),'));
+    pattern.query.forEach((x) => x.type == "String"
+        ? body.write('${x.name}: parsed.optional("${x.name}"),')
+        : body.write('${x.name}: ${x.type}.parse(parsed.optional("${x.name}")),'));
 
     body.write("));");
 
@@ -87,14 +91,14 @@ class RouteBuilder {
       final args = pattern.segments
           .map((s) => s is ConstantSegment
               ? '"${s.value}"'
-              : ("arguments." + (s as DynamicSegment).name))
+              : ("arguments." + (s as DynamicSegment).name) + ".toString()")
           .join(",");
       body.write("[$args]");
     }
 
     if (pattern.query.isNotEmpty) {
       if (pattern.segments.isEmpty) body.write("[]");
-      final args = pattern.query.map((n) => '"$n": arguments.$n').join(",");
+      final args = pattern.query.map((n) => '"${n.name}": arguments.${n.name}.toString()').join(",");
       body.write(",{$args}");
     }
 
@@ -134,7 +138,7 @@ class ArgumentBuilder {
     pattern.segments
         .where((x) => x is DynamicSegment)
         .cast<DynamicSegment>()
-        .forEach((x) => _addField(x.name, true, builder, constructor));
+        .forEach((x) => _addField(x, true, builder, constructor));
     pattern.query
         .forEach((name) => _addField(name, false, builder, constructor));
 
@@ -143,20 +147,21 @@ class ArgumentBuilder {
     return builder.build();
   }
 
-  void _addField(String name, bool isRequired, ClassBuilder builder,
+  void _addField(TypedParameter typed, bool isRequired, ClassBuilder builder,
       ConstructorBuilder constructor) {
+    builder.fields.add(Field((b) => b
+      ..name = typed.name
+      ..type = refer(typed.type)
+      ..modifier = FieldModifier.final$));
+
     final parameter = ParameterBuilder()
-      ..name = name
-      ..named = true
-      ..toThis = true;
+      ..name = typed.name
+      ..toThis = true
+      ..named = true;
+
     if (isRequired) {
       parameter.annotations.add(CodeExpression(Code("required")));
     }
     constructor.optionalParameters.add(parameter.build());
-
-    builder.fields.add(Field((b) => b
-      ..name = name
-      ..type = refer("String")
-      ..modifier = FieldModifier.final$));
   }
 }
