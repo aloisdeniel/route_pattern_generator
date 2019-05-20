@@ -57,7 +57,8 @@ class RoutesBuilder {
           ..type = refer("RouteSettings"))
       ])));
 
-    builder.methods.add(_createPush(elements));
+    builder.methods.add(_createPush(elements, "push"));
+    builder.methods.add(_createPush(elements, "pushReplacement"));
 
     builder.fields.add(Field((f) => f
       ..name = "_router"
@@ -84,9 +85,9 @@ class RoutesBuilder {
     return builder.build();
   }
 
-  Method _createPush(List<AnnotatedElement> elements) {
+  Method _createPush(List<AnnotatedElement> elements, String methodName) {
     final result = MethodBuilder()
-      ..name = "push<TResult>"
+      ..name = "$methodName<TResult>"
       ..static = true
       ..returns = refer("Future<TResult>")
       ..requiredParameters.addAll([
@@ -104,7 +105,7 @@ class RoutesBuilder {
       final naming = RouteNaming(x.element.name);
       body.write("if(arguments is ${naming.argumentName}){");
       body.write(
-          "return Navigator.pushNamed<TResult>(context, ${x.element.name}.build(arguments));");
+          "return Navigator.${methodName}Named<TResult>(context, ${x.element.name}.build(arguments));");
       body.write("}");
     });
 
