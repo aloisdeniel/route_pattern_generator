@@ -4,12 +4,12 @@ import 'package:flutter/widgets.dart';
 part 'routes.g.dart';
 
 @RoutePattern("/?tab&[int]scroll")
-Route home(RouteSettings settins, HomeRouteArguments arguments) {
+String home(String settings, HomeRouteArguments arguments) {
 
 }
 
 @RoutePattern("/article/:[int]id")
-Route article(RouteSettings settins, ArticleRouteArguments arguments) {
+String article(String settings, ArticleRouteArguments arguments) {
 
 }
  

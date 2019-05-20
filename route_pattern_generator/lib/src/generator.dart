@@ -11,29 +11,31 @@ import 'builders.dart';
 import 'parsing.dart';
 
 class RoutePatternGenerator extends GeneratorForAnnotation<RoutePattern> {
-
   @override
   FutureOr<String> generate(LibraryReader library, BuildStep buildStep) async {
     final annotatedElements = library.annotatedWith(typeChecker).toList();
 
+    if (annotatedElements.isEmpty) return null;
+
     final routesBuilder = RoutesBuilder();
     var routesClass = routesBuilder.build(annotatedElements);
-
 
     final generateBuilder = OnGenerateRouteBuilder();
     var generateMethod = generateBuilder.build(annotatedElements);
 
     var emitter = DartEmitter();
-    var source = '${generateMethod.accept(emitter)} ${routesClass.accept(emitter)}';
-       
-    return DartFormatter().format(source) + '\n\n' + (await super.generate(library, buildStep));
+    var source =
+        '${generateMethod.accept(emitter)} ${routesClass.accept(emitter)}';
+
+    return DartFormatter().format(source) +
+        '\n\n' +
+        (await super.generate(library, buildStep));
   }
 
   @override
   Iterable<String> generateForAnnotatedElement(
       Element element, ConstantReader annotation, BuildStep buildStep) {
     if (element is FunctionElement) {
-
       final obj = annotation.objectValue;
       final value = obj.getField("pattern").toStringValue();
       final pattern = ParsedPattern.fromString(value);
@@ -41,8 +43,8 @@ class RoutePatternGenerator extends GeneratorForAnnotation<RoutePattern> {
       final argument = ArgumentBuilder().build(element.name, pattern);
       final route = RouteBuilder().build(element.name, pattern);
 
-      var library =
-          Library((b) => b..body.addAll([argument, route])..directives.addAll([]));
+      var library = Library(
+          (b) => b..body.addAll([argument, route])..directives.addAll([]));
 
       var emitter = DartEmitter();
       var source = '${library.accept(emitter)}';

@@ -57,6 +57,8 @@ class RoutesBuilder {
           ..type = refer("RouteSettings"))
       ])));
 
+    builder.methods.add(_createPush(elements));
+
     builder.fields.add(Field((f) => f
       ..name = "_router"
       ..modifier = FieldModifier.constant
@@ -80,6 +82,37 @@ class RoutesBuilder {
       ..assignment = Code(RouteNaming(e.element.name).routeName + '()'))));
 
     return builder.build();
+  }
+
+  Method _createPush(List<AnnotatedElement> elements) {
+    final result = MethodBuilder()
+      ..name = "push<TResult>"
+      ..static = true
+      ..returns = refer("Future<TResult>")
+      ..requiredParameters.addAll([
+        Parameter((p) => p
+          ..name = 'context'
+          ..type = refer("BuildContext")),
+        Parameter((p) => p
+          ..name = 'arguments'
+          ..type = refer("dynamic")),
+      ]);
+
+    final body = StringBuffer();
+
+    elements.forEach((x) {
+      final naming = RouteNaming(x.element.name);
+      body.write("if(arguments is ${naming.argumentName}){");
+      body.write(
+          "return Navigator.pushNamed<TResult>(context, ${x.element.name}.build(arguments));");
+      body.write("}");
+    });
+
+    body.write("throw Exception('No route found for argument');");
+
+    result.body = Code(body.toString());
+
+    return result.build();
   }
 }
 

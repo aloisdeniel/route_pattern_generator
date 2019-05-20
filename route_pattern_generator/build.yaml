@@ -3,6 +3,9 @@ targets:
     builders:
       route_pattern_generator|route_pattern:
         enabled: true
+        generate_for:
+            include:
+                - example/lib/*
 
 builders:
   route_pattern_generator:

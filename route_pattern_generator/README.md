@@ -66,6 +66,12 @@ class ExampleApp extends StatelessWidget {
 }
 ```
 
+To navigate to a given route, a `Routes.push` method is also available :
+
+```dart
+await Routes.push(context, ArticleRouteArguments(id: '12345'));
+```
+
 ## How to use
 
 ### Install

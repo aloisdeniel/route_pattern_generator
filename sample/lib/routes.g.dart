@@ -29,6 +29,17 @@ abstract class Routes {
     return _onGenerateRoute(settings);
   }
 
+  static Future<TResult> push<TResult>(
+      BuildContext context, dynamic arguments) {
+    if (arguments is HomeRouteArguments) {
+      return Navigator.pushNamed<TResult>(context, home.build(arguments));
+    }
+    if (arguments is ArticleRouteArguments) {
+      return Navigator.pushNamed<TResult>(context, article.build(arguments));
+    }
+    throw Exception('No route found for argument');
+  }
+
   static MatchResult match(String path) {
     return _router.match(path);
   }
