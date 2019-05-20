@@ -6,12 +6,16 @@ part of 'routes.dart';
 // RoutePatternGenerator
 // **************************************************************************
 
-const router = const Router(routes: [Routes.home, Routes.article]);
-
 abstract class Routes {
+  static const _router = Router(routes: [home, article]);
+
   static const home = HomeRoute();
 
   static const article = ArticleRoute();
+
+  static MatchResult match(String path) {
+    return _router.match(path);
+  }
 }
 
 class HomeRouteArguments {

@@ -50,7 +50,7 @@ void main() {
 
   group('Router', () {
     test('contains route', () {
-      final match = router.match("/article/12345");
+      final match = Routes.match("/article/12345");
       expect(match is MatchResult<ArticleRouteArguments>, true);
       if (match is MatchResult<ArticleRouteArguments>) {
         expect(match.arguments.id, '12345');

@@ -36,10 +36,10 @@ expect(match.isSuccess, true);
 expect(match.arguments.id, '12345');
 ```
 
-A `router` is also generated to help you match one of the declared routes.
+A global `match` function is also generated to help you match one of the declared routes.
 
 ```dart
-final match = router.match("/article/12345");
+final match = Routes.match("/article/12345");
 if(match is MatchResult<ArticleRouteArguments>) {
     expect(match.arguments.id, '12345');
 }

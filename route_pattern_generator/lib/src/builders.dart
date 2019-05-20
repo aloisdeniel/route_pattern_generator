@@ -12,21 +12,27 @@ class RouteNaming {
   String get argumentName => "${_name.pascalCase}RouteArguments";
 }
 
-class RouterBuilder {
-  Code build(List<AnnotatedElement> elements) {
-    final body = StringBuffer("const router = const Router(routes:[");
-    final routes = elements.map((x) => "Routes." + x.element.name).join(",");
-    body.write(routes);
-    body.write("]);");
-    return Code(body.toString());
-  }
-}
-
 class RoutesBuilder {
   Class build(List<AnnotatedElement> elements) {
     final builder = ClassBuilder()
       ..name = "Routes"
       ..abstract = true;
+
+    builder.fields.add(Field((f) => f
+      ..name = "_router"
+      ..modifier = FieldModifier.constant
+      ..static = true
+      ..assignment = Code(
+          "Router(routes: [${elements.map((e) => e.element.name).join(",")}])")));
+
+    builder.methods.add(Method((b) => b
+      ..name = "match"
+      ..static = true
+      ..returns = refer("MatchResult")
+      ..body = Code("return _router.match(path);")
+      ..requiredParameters.add(Parameter((p) => p
+        ..name = 'path'
+        ..type = refer("String")))));
 
     elements.forEach((e) => builder.fields.add(Field((b) => b
       ..name = e.element.name

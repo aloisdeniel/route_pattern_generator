@@ -16,14 +16,11 @@ class RoutePatternGenerator extends GeneratorForAnnotation<RoutePattern> {
   FutureOr<String> generate(LibraryReader library, BuildStep buildStep) async {
     final annotatedElements = library.annotatedWith(typeChecker).toList();
 
-    final routerBuilder = RouterBuilder();
-    var routerCode = routerBuilder.build(annotatedElements);
-
     final routesBuilder = RoutesBuilder();
     var routesClass = routesBuilder.build(annotatedElements);
 
     var emitter = DartEmitter();
-    var source = '${routerCode.accept(emitter)} ${routesClass.accept(emitter)}';
+    var source = '${routesClass.accept(emitter)}';
        
     return DartFormatter().format(source) + '\n\n' + (await super.generate(library, buildStep));
   }

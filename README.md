@@ -26,7 +26,7 @@ expect(path, "/?tab=users");
 
 final match = Routes.home.match("/?tab=users");
 expect(match.isSuccess, true);
-expect(match.arguments.tab, '12345');
+expect(match.arguments.tab, 'users');
 
 final path = Routes.article.build(ArticleRouteArguments(id: "12345"));
 expect(path, "/article/12345");
@@ -36,10 +36,10 @@ expect(match.isSuccess, true);
 expect(match.arguments.id, '12345');
 ```
 
-A `router` is also generated to help you match one of the declared routes.
+A global `match` function is also generated to help you match one of the declared routes.
 
 ```dart
-final match = router.match("/article/12345");
+final match = Routes.match("/article/12345");
 if(match is MatchResult<ArticleRouteArguments>) {
     expect(match.arguments.id, '12345');
 }
