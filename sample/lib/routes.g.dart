@@ -6,12 +6,28 @@ part of 'routes.dart';
 // RoutePatternGenerator
 // **************************************************************************
 
+Route _onGenerateRoute(RouteSettings settings) {
+  final match = Routes.match(settings.name);
+  if (match is MatchResult<HomeRouteArguments>) {
+    return home(settings.copyWith(arguments: match.arguments), match.arguments);
+  }
+  if (match is MatchResult<ArticleRouteArguments>) {
+    return article(
+        settings.copyWith(arguments: match.arguments), match.arguments);
+  }
+  throw Exception('No route found');
+}
+
 abstract class Routes {
   static const _router = Router(routes: [home, article]);
 
   static const home = HomeRoute();
 
   static const article = ArticleRoute();
+
+  static Route onGenerateRoute(RouteSettings settings) {
+    return _onGenerateRoute(settings);
+  }
 
   static MatchResult match(String path) {
     return _router.match(path);
@@ -26,7 +42,7 @@ class HomeRouteArguments {
   final int scroll;
 }
 
-class HomeRoute extends Route<HomeRouteArguments> {
+class HomeRoute extends RouteMatcher<HomeRouteArguments> {
   const HomeRoute();
 
   @override
@@ -43,7 +59,7 @@ class HomeRoute extends Route<HomeRouteArguments> {
 
   @override
   String build(HomeRouteArguments arguments) {
-    return Route.buildPath([], {
+    return RouteMatcher.buildPath([], {
       "tab": arguments.tab.toString(),
       "scroll": arguments.scroll.toString()
     });
@@ -56,7 +72,7 @@ class ArticleRouteArguments {
   final int id;
 }
 
-class ArticleRoute extends Route<ArticleRouteArguments> {
+class ArticleRoute extends RouteMatcher<ArticleRouteArguments> {
   const ArticleRoute();
 
   @override
@@ -73,6 +89,6 @@ class ArticleRoute extends Route<ArticleRouteArguments> {
 
   @override
   String build(ArticleRouteArguments arguments) {
-    return Route.buildPath(["article", arguments.id.toString()]);
+    return RouteMatcher.buildPath(["article", arguments.id.toString()]);
   }
 }

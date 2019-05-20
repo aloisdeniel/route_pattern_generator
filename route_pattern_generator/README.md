@@ -8,40 +8,61 @@ Define your patterns as constant strings annoted with `@route`.
 
 ```dart
 import 'package:route_pattern/route_pattern.dart';
+import 'package:flutter/widgets.dart';
 
 part 'routes.g.dart';
 
-@route
-const home = "/?tab";
+@RoutePattern("/?tab&[int]scroll")
+Route home(RouteSettings settings, HomeRouteArguments arguments) {
+    // returns a Route
+}
 
-@route
-const article = "/article/:id";
+@RoutePattern("/article/:[int]id")
+Route article(RouteSettings settings, ArticleRouteArguments arguments) {
+    // returns a Route
+}
 ```
 
 Each constant will generate a `Route` with a `build` and `match` method, and a associated `Argument` class ([an example of the generate sources is available in the sample](sample/lib/routes.g.dart)).
 
 ```dart
+// Build specific routes
 final path = Routes.home.build(HomeRouteArguments(tab: "users"));
 expect(path, "/?tab=users");
-
-final match = Routes.home.match("/?tab=users");
-expect(match.isSuccess, true);
-expect(match.arguments.tab, 'users');
 
 final path = Routes.article.build(ArticleRouteArguments(id: "12345"));
 expect(path, "/article/12345");
 
+// Match specific routes
+final match = Routes.home.match("/?tab=users");
+expect(match.isSuccess, true);
+expect(match.arguments.tab, 'users');
+
 final match = Routes.article.match("/article/12345");
 expect(match.isSuccess, true);
 expect(match.arguments.id, '12345');
-```
 
-A global `match` function is also generated to help you match one of the declared routes.
-
-```dart
+// Or get the first matching route
 final match = Routes.match("/article/12345");
 if(match is MatchResult<ArticleRouteArguments>) {
     expect(match.arguments.id, '12345');
+}
+```
+
+A `Routes.onGenerateRoute` method is also generated to use in your app or navigator. It will match the first route which settings name matches a pattern and call your declared function with corresponding arguments.
+
+```dart
+import 'package:sample/routes.dart';
+import 'package:flutter/material.dart';
+
+class ExampleApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      onGenerateRoute: Routes.onGenerateRoute,
+      // ...
+    );
+  }
 }
 ```
 

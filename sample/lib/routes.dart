@@ -1,10 +1,15 @@
 import 'package:route_pattern/route_pattern.dart';
+import 'package:flutter/widgets.dart';
 
 part 'routes.g.dart';
 
-@route
-const home = "/?tab&[int]scroll";
+@RoutePattern("/?tab&[int]scroll")
+Route home(RouteSettings settins, HomeRouteArguments arguments) {
 
-@route
-const article = "/article/:[int]id";
+}
+
+@RoutePattern("/article/:[int]id")
+Route article(RouteSettings settins, ArticleRouteArguments arguments) {
+
+}
  

@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 import 'route.dart';
 
 class Router {
-  final List<Route> routes;
+  final List<RouteMatcher> routes;
 
   const Router({@required this.routes});
 

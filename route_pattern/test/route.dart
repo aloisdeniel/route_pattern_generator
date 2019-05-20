@@ -4,37 +4,37 @@ import 'package:test/test.dart';
 void main() {
   group('Building a route', () {
     test('with a no segments and query', () async {
-      final result = Route.buildPath();
+      final result = RouteMatcher.buildPath();
       expect(result, "/");
     });
 
     test('with a null segments and query', () async {
-      final result = Route.buildPath(null, null);
+      final result = RouteMatcher.buildPath(null, null);
       expect(result, "/");
     });
 
     test('with segments', () async {
-      final result = Route.buildPath(["example", "test"]);
+      final result = RouteMatcher.buildPath(["example", "test"]);
       expect(result, "/example/test");
     });
 
     test('with encoded segments', () async {
-      final result = Route.buildPath(["example", "§è4874ç'ç!('(\$'(!è\"'//\\\\", "test"]);
+      final result = RouteMatcher.buildPath(["example", "§è4874ç'ç!('(\$'(!è\"'//\\\\", "test"]);
       expect(result, "/example/%C2%A7%C3%A84874%C3%A7'%C3%A7!('(%24'(!%C3%A8%22'%2F%2F%5C%5C/test");
     });
 
     test('with a single query parameter', () async {
-      final result = Route.buildPath(["example", "test"], { "oh": "yeah"});
+      final result = RouteMatcher.buildPath(["example", "test"], { "oh": "yeah"});
       expect(result, "/example/test?oh=yeah");
     });
 
     test('with multiple query parameters', () async {
-      final result = Route.buildPath(["example", "test"], { "oh": "yeah", "eh": "meh"});
+      final result = RouteMatcher.buildPath(["example", "test"], { "oh": "yeah", "eh": "meh"});
       expect(["/example/test?oh=yeah&eh=meh","/example/test?eh=meh&oh=yeah"].contains(result), true);
     });
 
     test('with encoded query parameters', () async {
-      final result = Route.buildPath(["example", "test"], { "§": "è"});
+      final result = RouteMatcher.buildPath(["example", "test"], { "§": "è"});
       expect(result, "/example/test?%C2%A7=%C3%A8");
     });
   });

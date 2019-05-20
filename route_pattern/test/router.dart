@@ -12,10 +12,10 @@ class ExampleRouteArguments {
       this.optionalExample2});
 }
 
-class ExampleRoute extends Route<ExampleRouteArguments> {
+class ExampleRoute extends RouteMatcher<ExampleRouteArguments> {
   @override
   String build(ExampleRouteArguments args) {
-    return Route.buildPath([
+    return RouteMatcher.buildPath([
       "test",
       args.requiredExample,
     ], {
@@ -45,10 +45,10 @@ class ExampleRouteArguments2 {
   ExampleRouteArguments2();
 }
 
-class ExampleRoute2 extends Route<ExampleRouteArguments2> {
+class ExampleRoute2 extends RouteMatcher<ExampleRouteArguments2> {
   @override
   String build(ExampleRouteArguments2 args) {
-    return Route.buildPath(["test"]);
+    return RouteMatcher.buildPath(["test"]);
   }
 
   @override

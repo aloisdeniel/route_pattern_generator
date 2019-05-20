@@ -1,9 +1,9 @@
 import 'package:meta/meta.dart';
 
 /// A base route class that can build or match pathes.
-abstract class Route<T> {
+abstract class RouteMatcher<T> {
 
-  const Route();
+  const RouteMatcher();
 
   /// Build a new path from given [args].
   String build(T args);
@@ -76,7 +76,7 @@ class ParsedRoute {
 }
 
 class MatchResult<T> {
-  final Route<T> route;
+  final RouteMatcher<T> route;
   final T arguments;
   final bool isSuccess;
   MatchResult._(
@@ -84,9 +84,9 @@ class MatchResult<T> {
       @required this.arguments,
       @required this.isSuccess});
 
-  MatchResult.fail(Route<T> route)
+  MatchResult.fail(RouteMatcher<T> route)
       : this._(isSuccess: false, route: route, arguments: null);
 
-  MatchResult.success(Route<T> route, T arguments)
+  MatchResult.success(RouteMatcher<T> route, T arguments)
       : this._(isSuccess: true, route: route, arguments: arguments);
 }

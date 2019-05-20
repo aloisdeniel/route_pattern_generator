@@ -6,6 +6,8 @@ environment:
 
 dependencies:
   route_pattern: 
+  flutter:
+    sdk: flutter
 
 dev_dependencies:
   test:

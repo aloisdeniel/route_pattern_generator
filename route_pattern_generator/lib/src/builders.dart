@@ -12,11 +12,50 @@ class RouteNaming {
   String get argumentName => "${_name.pascalCase}RouteArguments";
 }
 
+class OnGenerateRouteBuilder {
+  Method build(List<AnnotatedElement> elements) {
+    final builder = MethodBuilder()
+      ..name = "_onGenerateRoute"
+      ..returns = refer("Route")
+      ..requiredParameters.addAll([
+        Parameter((p) => p
+          ..name = "settings"
+          ..type = refer("RouteSettings"))
+      ]);
+
+    final body = StringBuffer();
+    body.write("final match = Routes.match(settings.name);");
+    for (var element in elements) {
+      final naming = RouteNaming(element.element.name);
+      body.write("if (match is MatchResult<${naming.argumentName}>) {");
+      body.write(
+          "return ${element.element.name}(settings.copyWith(arguments: match.arguments), match.arguments);");
+      body.write("}");
+    }
+    body.write("throw Exception('No route found');");
+
+    builder.body = Code(body.toString());
+
+    return builder.build();
+  }
+}
+
 class RoutesBuilder {
   Class build(List<AnnotatedElement> elements) {
     final builder = ClassBuilder()
       ..name = "Routes"
       ..abstract = true;
+
+    builder.methods.add(Method((m) => m
+      ..name = "onGenerateRoute"
+      ..returns = refer("Route")
+      ..static = true
+      ..body = Code("return _onGenerateRoute(settings);")
+      ..requiredParameters.addAll([
+        Parameter((p) => p
+          ..name = "settings"
+          ..type = refer("RouteSettings"))
+      ])));
 
     builder.fields.add(Field((f) => f
       ..name = "_router"
@@ -68,7 +107,8 @@ class RouteBuilder {
 
     pattern.query.forEach((x) => x.type == "String"
         ? body.write('${x.name}: parsed.optional("${x.name}"),')
-        : body.write('${x.name}: ${x.type}.parse(parsed.optional("${x.name}")),'));
+        : body.write(
+            '${x.name}: ${x.type}.parse(parsed.optional("${x.name}")),'));
 
     body.write("));");
 
@@ -85,7 +125,7 @@ class RouteBuilder {
   Method _createBuild(ParsedPattern pattern, RouteNaming naming) {
     final body = StringBuffer();
 
-    body.write("return Route.buildPath(");
+    body.write("return RouteMatcher.buildPath(");
 
     if (pattern.segments.isNotEmpty) {
       final args = pattern.segments
@@ -98,7 +138,9 @@ class RouteBuilder {
 
     if (pattern.query.isNotEmpty) {
       if (pattern.segments.isEmpty) body.write("[]");
-      final args = pattern.query.map((n) => '"${n.name}": arguments.${n.name}.toString()').join(",");
+      final args = pattern.query
+          .map((n) => '"${n.name}": arguments.${n.name}.toString()')
+          .join(",");
       body.write(",{$args}");
     }
 
@@ -118,7 +160,7 @@ class RouteBuilder {
     final naming = RouteNaming(name);
     final builder = ClassBuilder()
       ..name = naming.routeName
-      ..extend = refer("Route<${naming.argumentName}>");
+      ..extend = refer("RouteMatcher<${naming.argumentName}>");
 
     builder.constructors.add(Constructor((b) => b..constant = true));
 
