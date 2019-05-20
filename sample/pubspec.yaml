@@ -8,6 +8,7 @@ dependencies:
   route_pattern: 
 
 dev_dependencies:
+  test:
   build_runner: ^1.0.0
   route_pattern_generator:
 
