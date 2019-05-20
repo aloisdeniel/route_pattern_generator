@@ -1,15 +1,16 @@
+import 'package:flutter/material.dart';
 import 'package:route_pattern/route_pattern.dart';
 import 'package:flutter/widgets.dart';
 
 part 'routes.g.dart';
 
 @RoutePattern("/?tab&[int]scroll")
-String home(String settings, HomeRouteArguments arguments) {
-
+Route home(RouteSettings settins, HomeRouteArguments arguments) {
+  return MaterialPageRoute(builder: (c) => Text("Home"));
 }
 
 @RoutePattern("/article/:[int]id")
-String article(String settings, ArticleRouteArguments arguments) {
-
+Route article(RouteSettings settins, ArticleRouteArguments arguments) {
+  return MaterialPageRoute(builder: (c) => Text("Article"));
 }
  
