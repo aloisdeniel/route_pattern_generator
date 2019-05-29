@@ -7,7 +7,7 @@ part of 'routes.dart';
 // **************************************************************************
 
 Route _onGenerateRoute(RouteSettings settings) {
-  final match = Routes.match(settings.name);
+  final match = Routes.match(settings.name.replaceAll('+', '/'));
   if (match is MatchResult<HomeRouteArguments>) {
     return home(settings.copyWith(arguments: match.arguments), match.arguments);
   }
@@ -29,13 +29,27 @@ abstract class Routes {
     return _onGenerateRoute(settings);
   }
 
-  static Future<TResult> push<TResult>(
-      BuildContext context, dynamic arguments) {
+  static Future<T> push<T>(BuildContext context, dynamic arguments) {
     if (arguments is HomeRouteArguments) {
-      return Navigator.pushNamed<TResult>(context, home.build(arguments));
+      return Navigator.pushNamed<T>(
+          context, home.build(arguments).replaceAll('/', '+'));
     }
     if (arguments is ArticleRouteArguments) {
-      return Navigator.pushNamed<TResult>(context, article.build(arguments));
+      return Navigator.pushNamed<T>(
+          context, article.build(arguments).replaceAll('/', '+'));
+    }
+    throw Exception('No route found for argument');
+  }
+
+  static Future<T> pushReplacement<T, TO>(
+      BuildContext context, dynamic arguments) {
+    if (arguments is HomeRouteArguments) {
+      return Navigator.pushReplacementNamed<T, TO>(
+          context, home.build(arguments).replaceAll('/', '+'));
+    }
+    if (arguments is ArticleRouteArguments) {
+      return Navigator.pushReplacementNamed<T, TO>(
+          context, article.build(arguments).replaceAll('/', '+'));
     }
     throw Exception('No route found for argument');
   }
@@ -60,19 +74,21 @@ class HomeRoute extends RouteMatcher<HomeRouteArguments> {
   MatchResult<HomeRouteArguments> match(String path) {
     final parsed = ParsedRoute.fromPath(path);
     if (parsed.requiredCount != 0) return MatchResult.fail(this);
+    final optional_tab = parsed.optional('tab');
+    final optional_scroll = parsed.optional('scroll');
     return MatchResult.success(
         this,
         HomeRouteArguments(
-          tab: parsed.optional("tab"),
-          scroll: int.parse(parsed.optional("scroll")),
+          tab: optional_tab,
+          scroll: optional_scroll == null ? null : int.parse(optional_scroll),
         ));
   }
 
   @override
   String build(HomeRouteArguments arguments) {
     return RouteMatcher.buildPath([], {
-      "tab": arguments.tab.toString(),
-      "scroll": arguments.scroll.toString()
+      "tab": arguments.tab?.toString(),
+      "scroll": arguments.scroll?.toString()
     });
   }
 }

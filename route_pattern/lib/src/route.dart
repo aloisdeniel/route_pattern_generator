@@ -2,7 +2,6 @@ import 'package:meta/meta.dart';
 
 /// A base route class that can build or match pathes.
 abstract class RouteMatcher<T> {
-
   const RouteMatcher();
 
   /// Build a new path from given [args].
@@ -21,12 +20,22 @@ abstract class RouteMatcher<T> {
 
     if (query != null && query.isNotEmpty) {
       final entries = query.entries.toList();
+      var started = false;
       for (var i = 0; i < entries.length; i++) {
         final entry = entries[i];
-        buffer.write(i == 0 ? "?" : "&");
-        buffer.write(Uri.encodeQueryComponent(entry.key));
-        buffer.write("=");
-        buffer.write(Uri.encodeQueryComponent(entry.value));
+
+        if (entry.value != null) {
+          if (!started) {
+            buffer.write("?");
+            started = true;
+          } else {
+            buffer.write("&");
+          }
+
+          buffer.write(Uri.encodeQueryComponent(entry.key));
+          buffer.write("=");
+          buffer.write(Uri.encodeQueryComponent(entry.value));
+        }
       }
     }
 
@@ -34,12 +43,11 @@ abstract class RouteMatcher<T> {
   }
 }
 
-/// The result of a parsed path to extract path 
+/// The result of a parsed path to extract path
 /// segments and query arguments.
-/// 
+///
 /// Generally used underneat by the implemented [Route]s.
 class ParsedRoute {
-
   final List<String> _segments;
 
   final Map<String, String> _query;

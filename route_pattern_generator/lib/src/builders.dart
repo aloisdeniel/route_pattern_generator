@@ -24,7 +24,7 @@ class OnGenerateRouteBuilder {
       ]);
 
     final body = StringBuffer();
-    body.write("final match = Routes.match(settings.name);");
+    body.write("final match = Routes.match(settings.name.replaceAll('+', '/'));");
     for (var element in elements) {
       final naming = RouteNaming(element.element.name);
       body.write("if (match is MatchResult<${naming.argumentName}>) {");
@@ -57,8 +57,8 @@ class RoutesBuilder {
           ..type = refer("RouteSettings"))
       ])));
 
-    builder.methods.add(_createPush(elements, "push"));
-    builder.methods.add(_createPush(elements, "pushReplacement"));
+    builder.methods.add(_createPush(elements, "push", "<T>"));
+    builder.methods.add(_createPush(elements, "pushReplacement", "<T, TO>"));
 
     builder.fields.add(Field((f) => f
       ..name = "_router"
@@ -85,11 +85,11 @@ class RoutesBuilder {
     return builder.build();
   }
 
-  Method _createPush(List<AnnotatedElement> elements, String methodName) {
+  Method _createPush(List<AnnotatedElement> elements, String methodName, String args) {
     final result = MethodBuilder()
-      ..name = "$methodName<TResult>"
+      ..name = "$methodName$args"
       ..static = true
-      ..returns = refer("Future<TResult>")
+      ..returns = refer("Future<T>")
       ..requiredParameters.addAll([
         Parameter((p) => p
           ..name = 'context'
@@ -105,7 +105,7 @@ class RoutesBuilder {
       final naming = RouteNaming(x.element.name);
       body.write("if(arguments is ${naming.argumentName}){");
       body.write(
-          "return Navigator.${methodName}Named<TResult>(context, ${x.element.name}.build(arguments));");
+          "return Navigator.${methodName}Named$args(context, ${x.element.name}.build(arguments).replaceAll('/', '+'));");
       body.write("}");
     });
 
@@ -130,6 +130,10 @@ class RouteBuilder {
     body.write("final parsed = ParsedRoute.fromPath(path);");
     body.write(
         "if (${conditions.join(" || ")}) return MatchResult.fail(this);");
+
+    pattern.query.forEach((x) =>
+      body.write( "final optional_${x.name} = parsed.optional('${x.name}');"));
+    
     body.write("return MatchResult.success(this,${naming.argumentName}(");
     pattern.segments
         .where((x) => x is DynamicSegment)
@@ -140,9 +144,9 @@ class RouteBuilder {
                 "${x.name}: ${x.type}.parse(parsed.required(${x.index})),"));
 
     pattern.query.forEach((x) => x.type == "String"
-        ? body.write('${x.name}: parsed.optional("${x.name}"),')
+        ? body.write('${x.name}: optional_${x.name},')
         : body.write(
-            '${x.name}: ${x.type}.parse(parsed.optional("${x.name}")),'));
+            '${x.name}: optional_${x.name} == null ? null : ${x.type}.parse(optional_${x.name}),'));
 
     body.write("));");
 
@@ -173,7 +177,7 @@ class RouteBuilder {
     if (pattern.query.isNotEmpty) {
       if (pattern.segments.isEmpty) body.write("[]");
       final args = pattern.query
-          .map((n) => '"${n.name}": arguments.${n.name}.toString()')
+          .map((n) => '"${n.name}": arguments.${n.name}?.toString()')
           .join(",");
       body.write(",{$args}");
     }
