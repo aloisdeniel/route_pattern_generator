@@ -24,7 +24,8 @@ class OnGenerateRouteBuilder {
       ]);
 
     final body = StringBuffer();
-    body.write("final match = Routes.match(settings.name.replaceAll('+', '/'));");
+    body.write(
+        "final match = Routes.match(settings.name.replaceAll('+', '/'));");
     for (var element in elements) {
       final naming = RouteNaming(element.element.name);
       body.write("if (match is MatchResult<${naming.argumentName}>) {");
@@ -65,7 +66,7 @@ class RoutesBuilder {
       ..modifier = FieldModifier.constant
       ..static = true
       ..assignment = Code(
-          "Router(routes: [${elements.map((e) => e.element.name).join(",")}])")));
+          "PatternRouter(routes: [${elements.map((e) => e.element.name).join(",")}])")));
 
     builder.methods.add(Method((b) => b
       ..name = "match"
@@ -85,7 +86,8 @@ class RoutesBuilder {
     return builder.build();
   }
 
-  Method _createPush(List<AnnotatedElement> elements, String methodName, String args) {
+  Method _createPush(
+      List<AnnotatedElement> elements, String methodName, String args) {
     final result = MethodBuilder()
       ..name = "$methodName$args"
       ..static = true
@@ -132,8 +134,8 @@ class RouteBuilder {
         "if (${conditions.join(" || ")}) return MatchResult.fail(this);");
 
     pattern.query.forEach((x) =>
-      body.write( "final optional_${x.name} = parsed.optional('${x.name}');"));
-    
+        body.write("final optional_${x.name} = parsed.optional('${x.name}');"));
+
     body.write("return MatchResult.success(this,${naming.argumentName}(");
     pattern.segments
         .where((x) => x is DynamicSegment)

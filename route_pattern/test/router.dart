@@ -81,7 +81,7 @@ void main() {
 
   group('Router', () {
     test('matches first route', () async {
-      final router = Router(routes: [
+      final router = PatternRouter(routes: [
         ExampleRoute(),
         ExampleRoute2(),
       ]);
@@ -92,7 +92,7 @@ void main() {
       expect(match.isSuccess, true);
     });
     test('matches second route', () async {
-      final router = Router(routes: [
+      final router = PatternRouter(routes: [
         ExampleRoute(),
         ExampleRoute2(),
       ]);

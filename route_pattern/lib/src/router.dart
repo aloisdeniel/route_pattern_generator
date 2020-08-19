@@ -2,12 +2,14 @@ import 'package:meta/meta.dart';
 
 import 'route.dart';
 
-class Router {
+class PatternRouter {
   final List<RouteMatcher> routes;
 
-  const Router({@required this.routes});
+  const PatternRouter({@required this.routes});
 
   MatchResult match(String path) {
-    return routes.map((x) => x.match(path)).firstWhere((x) => x.isSuccess, orElse: () => null);
+    return routes
+        .map((x) => x.match(path))
+        .firstWhere((x) => x.isSuccess, orElse: () => null);
   }
 }

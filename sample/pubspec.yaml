@@ -2,7 +2,7 @@ name: sample
 author: Aloïs Deniel <alois.deniel@outlook.com>
 
 environment:
-  sdk: '>=2.0.0 <3.0.0'
+  sdk: '>=2.7.0 <3.0.0'
 
 dependencies:
   route_pattern: 
@@ -11,7 +11,7 @@ dependencies:
 
 dev_dependencies:
   test:
-  build_runner: ^1.0.0
+  build_runner:
   route_pattern_generator:
 
 dependency_overrides:
