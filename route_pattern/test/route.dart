@@ -19,32 +19,34 @@ void main() {
     });
 
     test('with encoded segments', () async {
-      final result = RouteMatcher.buildPath(["example", "§è4874ç'ç!('(\$'(!è\"'//\\\\", "test"]);
-      expect(result, "/example/%C2%A7%C3%A84874%C3%A7'%C3%A7!('(%24'(!%C3%A8%22'%2F%2F%5C%5C/test");
+      final result = RouteMatcher.buildPath(
+          ["example", "§è4874ç'ç!('(\$'(!è\"'//\\\\", "test"]);
+      expect(result,
+          "/example/%C2%A7%C3%A84874%C3%A7'%C3%A7!('(%24'(!%C3%A8%22'%2F%2F%5C%5C/test");
     });
 
     test('with a single query parameter', () async {
-      final result = RouteMatcher.buildPath(["example", "test"], { "oh": "yeah"});
+      final result =
+          RouteMatcher.buildPath(["example", "test"], {"oh": "yeah"});
       expect(result, "/example/test?oh=yeah");
     });
 
     test('with multiple query parameters', () async {
-      final result = RouteMatcher.buildPath(["example", "test"], { "oh": "yeah", "eh": "meh"});
-      expect(["/example/test?oh=yeah&eh=meh","/example/test?eh=meh&oh=yeah"].contains(result), true);
+      final result = RouteMatcher.buildPath(
+          ["example", "test"], {"oh": "yeah", "eh": "meh"});
+      expect(
+          ["/example/test?oh=yeah&eh=meh", "/example/test?eh=meh&oh=yeah"]
+              .contains(result),
+          true);
     });
 
     test('with encoded query parameters', () async {
-      final result = RouteMatcher.buildPath(["example", "test"], { "§": "è"});
+      final result = RouteMatcher.buildPath(["example", "test"], {"§": "è"});
       expect(result, "/example/test?%C2%A7=%C3%A8");
     });
   });
 
   group('Route parsing', () {
-    test('with a null path', () async {
-      final parsed = ParsedRoute.fromPath(null);
-      expect(parsed, null);
-    });
-
     test('with an empty path', () async {
       final parsed = ParsedRoute.fromPath("");
       expect(parsed.isEmpty, true);
@@ -72,7 +74,8 @@ void main() {
     });
 
     test('with encoded segments', () async {
-      final parsed = ParsedRoute.fromPath("/example/%C2%A7%C3%A84874%C3%A7%27%C3%A7%21%28%27%28%24%27%28%21%C3%A8%22%27%2F%2F%5C%5C/static");
+      final parsed = ParsedRoute.fromPath(
+          "/example/%C2%A7%C3%A84874%C3%A7%27%C3%A7%21%28%27%28%24%27%28%21%C3%A8%22%27%2F%2F%5C%5C/static");
       expect(parsed.isEmpty, false);
       expect(parsed.hasOptionals, false);
 
@@ -118,7 +121,8 @@ void main() {
     });
 
     test('with a multiple encoded query parameters', () async {
-      final parsed = ParsedRoute.fromPath("/example/test?k=%C2%A7%C3%A8&o=4874");
+      final parsed =
+          ParsedRoute.fromPath("/example/test?k=%C2%A7%C3%A8&o=4874");
       expect(parsed.isEmpty, false);
       expect(parsed.hasOptionals, true);
       expect(parsed.optional("o"), "4874");

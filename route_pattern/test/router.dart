@@ -1,15 +1,15 @@
-import 'package:meta/meta.dart';
 import 'package:route_pattern/route_pattern.dart';
 import 'package:test/test.dart';
 
 class ExampleRouteArguments {
   final String requiredExample;
-  final String optionalExample1;
-  final String optionalExample2;
-  ExampleRouteArguments(
-      {@required this.requiredExample,
-      this.optionalExample1,
-      this.optionalExample2});
+  final String? optionalExample1;
+  final String? optionalExample2;
+  ExampleRouteArguments({
+    required this.requiredExample,
+    this.optionalExample1,
+    this.optionalExample2,
+  });
 }
 
 class ExampleRoute extends RouteMatcher<ExampleRouteArguments> {
@@ -19,8 +19,8 @@ class ExampleRoute extends RouteMatcher<ExampleRouteArguments> {
       "test",
       args.requiredExample,
     ], {
-      "optionalExample1": args.optionalExample1,
-      "optionalExample2": args.optionalExample2,
+      "optionalExample1": args.optionalExample1!,
+      "optionalExample2": args.optionalExample2!,
     });
   }
 
@@ -34,7 +34,7 @@ class ExampleRoute extends RouteMatcher<ExampleRouteArguments> {
     return MatchResult.success(
         this,
         ExampleRouteArguments(
-          requiredExample: parsed.required(1),
+          requiredExample: parsed.required(1)!,
           optionalExample1: parsed.optional("optionalExample1"),
           optionalExample2: parsed.optional("optionalExample2"),
         ));

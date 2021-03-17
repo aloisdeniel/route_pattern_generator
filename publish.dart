@@ -1,13 +1,11 @@
-
 import 'dart:io';
 
 void main() async {
   print('version?');
-  final version = stdin.readLineSync().trim();
-
+  final version = stdin.readLineSync()!.trim();
 
   print('Updating root README from route_pattern_generator');
-  copy("route_pattern_generator/README.md","README.md");
+  copy("route_pattern_generator/README.md", "README.md");
 
   await updatePubspec(
       "route_pattern", (content) => updateVersion(content, version));
@@ -18,7 +16,7 @@ void main() async {
   });
 
   print('Confirm publish ? (y/n)');
-  if (stdin.readLineSync().trim() == 'y') {
+  if (stdin.readLineSync()!.trim() == 'y') {
     await publish("route_pattern");
     await publish("route_pattern_generator");
   }

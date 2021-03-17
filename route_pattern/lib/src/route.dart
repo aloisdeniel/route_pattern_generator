@@ -1,5 +1,3 @@
-import 'package:meta/meta.dart';
-
 /// A base route class that can build or match pathes.
 abstract class RouteMatcher<T> {
   const RouteMatcher();
@@ -10,7 +8,8 @@ abstract class RouteMatcher<T> {
   /// Trying to match the given [path].
   MatchResult<T> match(String path);
 
-  static String buildPath([List<String> segments, Map<String, String> query]) {
+  static String buildPath(
+      [List<String>? segments, Map<String, String>? query]) {
     final buffer = StringBuffer();
     if (segments == null || segments.isEmpty)
       buffer.write("/");
@@ -24,18 +23,16 @@ abstract class RouteMatcher<T> {
       for (var i = 0; i < entries.length; i++) {
         final entry = entries[i];
 
-        if (entry.value != null) {
-          if (!started) {
-            buffer.write("?");
-            started = true;
-          } else {
-            buffer.write("&");
-          }
-
-          buffer.write(Uri.encodeQueryComponent(entry.key));
-          buffer.write("=");
-          buffer.write(Uri.encodeQueryComponent(entry.value));
+        if (!started) {
+          buffer.write("?");
+          started = true;
+        } else {
+          buffer.write("&");
         }
+
+        buffer.write(Uri.encodeQueryComponent(entry.key));
+        buffer.write("=");
+        buffer.write(Uri.encodeQueryComponent(entry.value));
       }
     }
 
@@ -61,40 +58,49 @@ class ParsedRoute {
   ParsedRoute(this._segments, this._query);
 
   factory ParsedRoute.fromPath(String path) {
-    if (path == null) return null;
     final parts = path.split("?");
     final segments = (parts.length > 0)
         ? parts[0].split("/").where((x) => x.isNotEmpty).toList()
-        : [];
+        : const <String>[];
     final query = (parts.length > 1)
         ? Uri.splitQueryString(parts[1])
         : <String, String>{};
     return ParsedRoute(segments, query);
   }
 
-  String required(int index) {
+  String? required(int index) {
     final result = _segments[index];
-    return result == null ? null : Uri.decodeComponent(result);
+    return Uri.decodeComponent(result);
   }
 
-  String optional(String name) {
+  String? optional(String name) {
     final result = _query[name];
     return result == null ? null : result;
   }
 }
 
 class MatchResult<T> {
-  final RouteMatcher<T> route;
-  final T arguments;
+  final RouteMatcher<T>? route;
+  final T? _arguments;
+  T get arguments => _arguments!;
   final bool isSuccess;
-  MatchResult._(
-      {@required this.route,
-      @required this.arguments,
-      @required this.isSuccess});
+  const MatchResult._({
+    required this.route,
+    required T? arguments,
+    required this.isSuccess,
+  }) : _arguments = arguments;
 
-  MatchResult.fail(RouteMatcher<T> route)
-      : this._(isSuccess: false, route: route, arguments: null);
+  MatchResult.fail(RouteMatcher<T>? route)
+      : this._(
+          isSuccess: false,
+          route: route,
+          arguments: null,
+        );
 
   MatchResult.success(RouteMatcher<T> route, T arguments)
-      : this._(isSuccess: true, route: route, arguments: arguments);
+      : this._(
+          isSuccess: true,
+          route: route,
+          arguments: arguments,
+        );
 }
